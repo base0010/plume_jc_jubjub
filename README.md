@@ -1,4 +1,4 @@
-## This is a repository for implementing PLUME - "Verifiably Deterministic Signatures on ECDSA".
+## This is a repository for implementing PLUME - "Verifiably Deterministic Signatures on ECDSA" on secure elements/ hardware wallets.
 
 
 ### This repository focuses an exploration for creating code for JavaCard capable secure elements, as this is the lionshare hardware wallet platfroms
