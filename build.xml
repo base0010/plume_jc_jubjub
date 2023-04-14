@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Plume" default="dist" basedir=".">
+
+    <get src="https://github.com/martinpaljak/ant-javacard/releases/latest/download/ant-javacard.jar" dest="." skipexisting="true"/>
+    <taskdef name="javacard" classname="pro.javacard.ant.JavaCard" classpath="ant-javacard.jar"/>
+
+    <description>Builds the project. </description>
+    <target name="dist" description="generate the distribution">
+        <tstamp/>
+        <javacard jckit="ext/sdks/jc304_kit">
+            <cap targetsdk="ext/sdks/jc304_kit" aid="a0:00:00:00:87:10:02:ff:86:ff:ff:89:ff:ff" output="PLUME.cap" sources="src" version="1.0">
+                <applet class="com.base0010.plume.PLUME" aid="a0:00:00:00:87:10:02:ff:86:ff:ff:89:ff:ff:ff:ff"/>
+                <!-- Probably unneeded -->
+            	<import jar="ext/sdks/jc304_kit/lib/globalplatform.jar" />
+            </cap>
+        </javacard>
+    </target>
+    <target name="clean" description="clean up">
+        <!-- Delete the built applet -->
+        <delete dir="PLUME.cap"/>
+    </target>
+
+</project>
