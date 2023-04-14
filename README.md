@@ -3,7 +3,7 @@
 
 ### This repository focuses an exploration for creating code for JavaCard capable secure elements, as this is the lionshare hardware wallet platfroms
 
-[PLUME docs and github] https://github.com/zk-nullifier-sig/zk-nullifier-sig/
+[PLUME docs and github](https://github.com/zk-nullifier-sig/zk-nullifier-sig/)
 
 
 ### Requirements:
@@ -13,13 +13,13 @@ that has support for EC point multiplication.
 
 This will work on existing JC wallet implementations ex. Status Keycard, Kong, and Semaphore SIM.
 
-An explination of this can be found [JCMathLib] https://github.com/OpenCryptoProject/JCMathLib
-As well as a list of supported cards here [JCAlgTest] https://www.fi.muni.cz/~xsvenda/jcalgtest/table.html
+An explination of this can be found [JCMathLib](https://github.com/OpenCryptoProject/JCMathLib)
+As well as a list of supported cards here [JCAlgTest](https://www.fi.muni.cz/~xsvenda/jcalgtest/table.html)
 
 ### Features:
 Hardware:
 
-- [] Can create nullifier, given external hash2curve msg.
+- [] Can create nullifier, given external hash2curve msg. **currently being worked on**
 - [] Can do hash2curve algorithm on-device (SSWU).
 - [] Can encode message to XMD
 - [] Computes PLUME and other signals - pk, s, c , gPowR, hashMPKPowR
