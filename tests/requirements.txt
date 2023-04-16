@@ -1,0 +1,3 @@
+wheel
+swig
+pyscard
