@@ -22,7 +22,24 @@ public class PLUME extends Applet {
     // confirm uncompressed pub len
     private static short PK_LEN = 65;
     private static short SK_LEN = 32;
+
+    private static final byte TEST_PRIVATE_KEY[] = {
+        (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
+        (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
+        (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
+        (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
+    };
+
+    private static final byte TEST_HASH[] = {
+        (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
+        (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
+        (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
+        (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
+    };
+
     SECP256k1 secp256k1 = new SECP256k1();
+    BABYJUBJUB babyjubjub = new BABYJUBJUB();
+
 
     // init
     public PLUME() {
@@ -85,6 +102,18 @@ public class PLUME extends Applet {
         }
     }
 
+    public void handleSetPrivateKey(APDU apdu) {
+
+    }
+
+    public void handleSignHashToCurveInput(APDU apdu) {
+
+    }
+
+    public void handleCurveSwitch(APDU apdu) {
+
+    }
+
     public void process(APDU apdu) {
         if (selectingApplet()) {
             // return 9000 if it's just normal applet selection
@@ -93,6 +122,7 @@ public class PLUME extends Applet {
 
         byte buf[] = apdu.getBuffer();
 
+        // compute nullifier
         switch (buf[ISO7816.OFFSET_INS]) {
             // compute nullifier given hashed2curve input
             case (byte) 0x01:
@@ -105,6 +135,37 @@ public class PLUME extends Applet {
             case (byte) 0x02:
                 try {
                     this.handleEchoPubkey(apdu);
+                } catch (ISOException e) {
+                    ISOException.throwIt(ISO7816.SW_CONDITIONS_NOT_SATISFIED);
+                }
+
+                // bring your own hash outputs signature
+            case (byte) 0x03:
+                try {
+
+                    this.handleSignHashToCurveInput(apdu);
+
+                } catch (ISOException e) {
+                    ISOException.throwIt(ISO7816.SW_CONDITIONS_NOT_SATISFIED);
+                }
+                // bring your own private key
+            case (byte) 0x04:
+                try {
+                    // seed in a private key
+                    this.handleSetPrivateKey(apdu);
+
+                } catch (ISOException e) {
+                    ISOException.throwIt(ISO7816.SW_CONDITIONS_NOT_SATISFIED);
+                }
+
+                // switch out curve
+                // default to BABYJUBJUB
+                // P1 = 0 for BABYJUBJUB
+                // P1 = 1 for SECP256K1
+            case (byte) 0x05:
+                try {
+
+                    this.handleCurveSwitch(apdu);
                 } catch (ISOException e) {
                     ISOException.throwIt(ISO7816.SW_CONDITIONS_NOT_SATISFIED);
                 }
