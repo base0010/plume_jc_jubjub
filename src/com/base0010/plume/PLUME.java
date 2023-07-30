@@ -15,6 +15,8 @@ public class PLUME extends Applet {
     // public key
     private ECPublicKey pk;
 
+    private byte selected_curve = 0;
+
     // message that's been hashed2curve
     private byte[] hashedMessage;
 
@@ -24,22 +26,21 @@ public class PLUME extends Applet {
     private static short SK_LEN = 32;
 
     private static final byte TEST_PRIVATE_KEY[] = {
-        (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
-        (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
-        (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
-        (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
+            (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
+            (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
+            (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
+            (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
     };
 
     private static final byte TEST_HASH[] = {
-        (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
-        (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
-        (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
-        (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
+            (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
+            (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
+            (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
+            (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
     };
 
     SECP256k1 secp256k1 = new SECP256k1();
     BABYJUBJUB babyjubjub = new BABYJUBJUB();
-
 
     // init
     public PLUME() {
@@ -79,8 +80,16 @@ public class PLUME extends Applet {
         this.parseHash2Curve(apdu, hash2curveMsg);
 
         byte[] nullifierOutput = JCSystem.makeTransientByteArray(LEN_NULLIFIER, JCSystem.CLEAR_ON_DESELECT);
-        secp256k1.multiplyPoint(this.sk, hash2curveMsg, (short) 0, (short) LEN_HASHED2CURVE, nullifierOutput,
-                (short) 0);
+
+        switch (this.selected_curve) {
+            case (byte) 0x0:
+                babyjubjub.multiplyPoint(this.sk, hash2curveMsg, (short) 0, (short) LEN_HASHED2CURVE, nullifierOutput,
+                        (short) 0);
+            case (byte) 0x01:
+                secp256k1.multiplyPoint(this.sk, hash2curveMsg, (short) 0, (short) LEN_HASHED2CURVE, nullifierOutput,
+                        (short) 0);
+
+        }
 
         if (nullifierOutput != null) {
             apdu.setOutgoing();
@@ -111,6 +120,23 @@ public class PLUME extends Applet {
     }
 
     public void handleCurveSwitch(APDU apdu) {
+        switch (buf[ISO7816.OFFSET_INS]){
+            case (byte) 0x00:
+                try {
+                    this.selected_curve = (byte)0x00;
+                } catch (ISOException e) {
+                    ISOException.throwIt(ISO7816.SW_CONDITIONS_NOT_SATISFIED);
+                }
+
+            case (byte) 0x01:
+                try {
+                    this.selected_curve = (byte)0x01;
+                } catch (ISOException e) {
+                    ISOException.throwIt(ISO7816.SW_CONDITIONS_NOT_SATISFIED);
+                }
+
+
+        }
 
     }
 
@@ -159,7 +185,7 @@ public class PLUME extends Applet {
                 }
 
                 // switch out curve
-                // default to BABYJUBJUB
+                // default to BABYJUBJUB 
                 // P1 = 0 for BABYJUBJUB
                 // P1 = 1 for SECP256K1
             case (byte) 0x05:
