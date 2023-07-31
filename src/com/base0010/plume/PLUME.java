@@ -42,24 +42,61 @@ public class PLUME extends Applet {
     SECP256k1 secp256k1 = new SECP256k1();
     BABYJUBJUB babyjubjub = new BABYJUBJUB();
 
-    // init
+    // inits keypair with default TEST_HASH
     public PLUME() {
-        // create keypair every run, this means we have to echo pk out, todo: import
-        // keypair
         keyPair = new KeyPair(KeyPair.ALG_EC_FP, (short) 256);
+        keyPair.getPrivate().setS(TEST_PRIVATE_KEY, (short) 0, (short) TEST_PRIVATE_KEY.length);
 
         sk = (ECPrivateKey) keyPair.getPrivate();
         pk = (ECPublicKey) keyPair.getPublic();
 
-        // set these generic keys to SECP256k1 params
-        SECP256k1.setCurveParameters(sk);
-        SECP256k1.setCurveParameters(pk);
+    }
 
+    // generates a random EC256 keypair
+    public void handleGenerateNewKeypair() {
+        keyPair = new KeyPair(KeyPair.ALG_EC_FP, (short) 256);
+
+        sk = (ECPrivateKey) keyPair.getPrivate();
+        pk = (ECPublicKey) keyPair.getPublic();
     }
 
     public static void install(byte bArray[], short bOffset, byte bLength) {
         PLUME Plume = new PLUME();
         Plume.register(bArray, (short) (bOffset + 1), (byte) bArray[bOffset]);
+    }
+
+    public void handleComputeTestNullifier(APDU apdu) {
+        apdu.setIncomingAndReceive();
+
+        // todo: confirm these lengths, make global.
+        short LEN_HASHED2CURVE = TEST_HASH.length;
+        // check length is equal to ecdsa sig len or 128?
+        short LEN_NULLIFIER = (short) 65;
+
+        byte[] nullifierOutput = JCSystem.makeTransientByteArray(LEN_NULLIFIER, JCSystem.CLEAR_ON_DESELECT);
+
+        switch (this.selected_curve) {
+            case (byte) 0x0:
+                BABYJUBJUB.setCurveParameters(sk);
+                BABYJUBJUB.setCurveParameters(pk);
+
+                babyjubjub.multiplyPoint(this.sk, hash2curveMsg, (short) 0, (short) LEN_HASHED2CURVE, nullifierOutput,
+                        (short) 0);
+
+            case (byte) 0x01:
+                SECP256k1.setCurveParameters(sk);
+                SECP256k1.setCurveParameters(pk);
+
+                secp256k1.multiplyPoint(this.sk, hash2curveMsg, (short) 0, (short) LEN_HASHED2CURVE, nullifierOutput,
+                        (short) 0);
+
+        }
+
+        if (nullifierOutput != null) {
+            apdu.setOutgoing();
+            apdu.setOutgoingLength(LEN_NULLIFIER);
+            apdu.sendBytesLong(nullifierOutput, (short) 0, LEN_NULLIFIER);
+        }
     }
 
     // @dev
@@ -69,7 +106,7 @@ public class PLUME extends Applet {
         // return into res
     }
 
-    public void handleComputeNullifier(APDU apdu) {
+    public void handleComputeAnyNullifier(APDU apdu) {
         apdu.setIncomingAndReceive();
 
         // todo: confirm these lengths, make global.
@@ -83,9 +120,15 @@ public class PLUME extends Applet {
 
         switch (this.selected_curve) {
             case (byte) 0x0:
+                BABYJUBJUB.setCurveParameters(sk);
+                BABYJUBJUB.setCurveParameters(pk);
+
                 babyjubjub.multiplyPoint(this.sk, hash2curveMsg, (short) 0, (short) LEN_HASHED2CURVE, nullifierOutput,
                         (short) 0);
             case (byte) 0x01:
+                SECP256k1.setCurveParameters(sk);
+                SECP256k1.setCurveParameters(pk);
+
                 secp256k1.multiplyPoint(this.sk, hash2curveMsg, (short) 0, (short) LEN_HASHED2CURVE, nullifierOutput,
                         (short) 0);
 
@@ -115,26 +158,21 @@ public class PLUME extends Applet {
 
     }
 
-    public void handleSignHashToCurveInput(APDU apdu) {
-
-    }
-
     public void handleCurveSwitch(APDU apdu) {
-        switch (buf[ISO7816.OFFSET_INS]){
+        switch (buf[ISO7816.OFFSET_INS]) {
             case (byte) 0x00:
                 try {
-                    this.selected_curve = (byte)0x00;
+                    this.selected_curve = (byte) 0x00;
                 } catch (ISOException e) {
                     ISOException.throwIt(ISO7816.SW_CONDITIONS_NOT_SATISFIED);
                 }
 
             case (byte) 0x01:
                 try {
-                    this.selected_curve = (byte)0x01;
+                    this.selected_curve = (byte) 0x01;
                 } catch (ISOException e) {
                     ISOException.throwIt(ISO7816.SW_CONDITIONS_NOT_SATISFIED);
                 }
-
 
         }
 
@@ -153,7 +191,7 @@ public class PLUME extends Applet {
             // compute nullifier given hashed2curve input
             case (byte) 0x01:
                 try {
-                    this.handleComputeNullifier(apdu);
+                    this.handleComputeTestNullifier(apdu);
                 } catch (ISOException e) {
                     ISOException.throwIt(ISO7816.SW_CONDITIONS_NOT_SATISFIED);
                 }
@@ -169,7 +207,7 @@ public class PLUME extends Applet {
             case (byte) 0x03:
                 try {
 
-                    this.handleSignHashToCurveInput(apdu);
+                    this.handleComputeAnyNullifier(apdu);
 
                 } catch (ISOException e) {
                     ISOException.throwIt(ISO7816.SW_CONDITIONS_NOT_SATISFIED);
@@ -185,7 +223,7 @@ public class PLUME extends Applet {
                 }
 
                 // switch out curve
-                // default to BABYJUBJUB 
+                // default to BABYJUBJUB
                 // P1 = 0 for BABYJUBJUB
                 // P1 = 1 for SECP256K1
             case (byte) 0x05:
