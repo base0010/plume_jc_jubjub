@@ -18,7 +18,7 @@ public class PLUME extends Applet {
     private byte selected_curve = 0;
 
     // message that's been hashed2curve
-    private byte[] hashedMessage;
+    private byte[] nullifierOutput;
 
     // lens in bytes
     // confirm uncompressed pub len
@@ -45,9 +45,11 @@ public class PLUME extends Applet {
     // inits keypair with default TEST_HASH
     public PLUME() {
         keyPair = new KeyPair(KeyPair.ALG_EC_FP, (short) 256);
-        keyPair.getPrivate().setS(TEST_PRIVATE_KEY, (short) 0, (short) TEST_PRIVATE_KEY.length);
 
         sk = (ECPrivateKey) keyPair.getPrivate();
+
+        sk.setS(TEST_PRIVATE_KEY, (short) 0, (short) TEST_PRIVATE_KEY.length);
+
         pk = (ECPublicKey) keyPair.getPublic();
 
     }
@@ -69,25 +71,25 @@ public class PLUME extends Applet {
         apdu.setIncomingAndReceive();
 
         // todo: confirm these lengths, make global.
-        short LEN_HASHED2CURVE = TEST_HASH.length;
+        short LEN_HASHED2CURVE = (short) TEST_HASH.length;
         // check length is equal to ecdsa sig len or 128?
         short LEN_NULLIFIER = (short) 65;
 
-        byte[] nullifierOutput = JCSystem.makeTransientByteArray(LEN_NULLIFIER, JCSystem.CLEAR_ON_DESELECT);
+        nullifierOutput = JCSystem.makeTransientByteArray(LEN_NULLIFIER, JCSystem.CLEAR_ON_DESELECT);
 
         switch (this.selected_curve) {
             case (byte) 0x0:
                 BABYJUBJUB.setCurveParameters(sk);
                 BABYJUBJUB.setCurveParameters(pk);
 
-                babyjubjub.multiplyPoint(this.sk, hash2curveMsg, (short) 0, (short) LEN_HASHED2CURVE, nullifierOutput,
+                babyjubjub.multiplyPoint(this.sk, TEST_HASH, (short) 0, (short) LEN_HASHED2CURVE, nullifierOutput,
                         (short) 0);
 
             case (byte) 0x01:
                 SECP256k1.setCurveParameters(sk);
                 SECP256k1.setCurveParameters(pk);
 
-                secp256k1.multiplyPoint(this.sk, hash2curveMsg, (short) 0, (short) LEN_HASHED2CURVE, nullifierOutput,
+                secp256k1.multiplyPoint(this.sk, TEST_HASH, (short) 0, (short) LEN_HASHED2CURVE, nullifierOutput,
                         (short) 0);
 
         }
@@ -97,6 +99,7 @@ public class PLUME extends Applet {
             apdu.setOutgoingLength(LEN_NULLIFIER);
             apdu.sendBytesLong(nullifierOutput, (short) 0, LEN_NULLIFIER);
         }
+
     }
 
     // @dev
@@ -159,6 +162,7 @@ public class PLUME extends Applet {
     }
 
     public void handleCurveSwitch(APDU apdu) {
+        byte[] buf = apdu.getBuffer();
         switch (buf[ISO7816.OFFSET_INS]) {
             case (byte) 0x00:
                 try {
