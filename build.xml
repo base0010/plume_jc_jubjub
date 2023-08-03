@@ -9,7 +9,7 @@
         <tstamp/>
         <javacard jckit="ext/sdks/jc304_kit">
             <cap targetsdk="ext/sdks/jc304_kit" aid="a0:00:00:00:87:10:02:ff:86:ff:ff:89:ff:ff" output="PLUME.cap" sources="src" version="1.0">
-                <applet class="com.base0010.plume.PLUME" aid="a0:00:00:00:87:10:02:ff:86:ff:ff:89:ff:ff:ff:ff"/>
+                <applet class="com.base0010.plume.PLUME" aid="a0:00:00:00:87:10:02:ff:86:ff:ff:89:ff:ff:de:ad"/>
                 <!-- Probably unneeded -->
             	<import jar="ext/sdks/jc304_kit/lib/globalplatform.jar" />
             </cap>
