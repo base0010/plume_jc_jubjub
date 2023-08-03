@@ -77,20 +77,31 @@ public class PLUME extends Applet {
 
         nullifierOutput = JCSystem.makeTransientByteArray(LEN_NULLIFIER, JCSystem.CLEAR_ON_DESELECT);
 
+
+        Signature sig = Signature.getInstance(Signature.ALG_ECDSA_SHA_256, false);
+
         switch (this.selected_curve) {
             case (byte) 0x0:
                 BABYJUBJUB.setCurveParameters(sk);
                 BABYJUBJUB.setCurveParameters(pk);
 
-                babyjubjub.multiplyPoint(this.sk, TEST_HASH, (short) 0, (short) LEN_HASHED2CURVE, nullifierOutput,
-                        (short) 0);
+                sig.init(this.sk, Signature.MODE_SIGN);
+        		sig.signPreComputedHash(this.TEST_HASH, (short) 0, (short) this.TEST_HASH.length, nullifierOutput, (short) 0);
+
+
+                // babyjubjub.multiplyPoint(this.sk, TEST_HASH, (short) 0, (short) LEN_HASHED2CURVE, nullifierOutput,
+                //         (short) 0);
 
             case (byte) 0x01:
                 SECP256k1.setCurveParameters(sk);
-                SECP256k1.setCurveParameters(pk);
+                SECP256k1.setCurveParameters(pk);   
+        		sig.init(this.sk, Signature.MODE_SIGN);
+        		sig.signPreComputedHash(this.TEST_HASH, (short) 0, (short) this.TEST_HASH.length, nullifierOutput, (short) 0);
 
-                secp256k1.multiplyPoint(this.sk, TEST_HASH, (short) 0, (short) LEN_HASHED2CURVE, nullifierOutput,
-                        (short) 0);
+
+
+                // secp256k1.multiplyPoint(this.sk, TEST_HASH, (short) 0, (short) LEN_HASHED2CURVE, nullifierOutput,
+                //         (short) 0);
 
         }
 
