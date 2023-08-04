@@ -1,8 +1,10 @@
 package com.base0010.plume;
 
+
 import javacard.framework.*;
 import javacard.security.*;
 import javacardx.crypto.*;
+
 
 public class PLUME extends Applet {
 
@@ -90,9 +92,23 @@ public class PLUME extends Applet {
 
 		ECPrivateKey privKeyU = (ECPrivateKey) kpU.getPrivate();
 
+
         BABYJUBJUB.setCurveParameters(privKeyU);
 
-        KeyAgreement ecdh = KeyAgreement.getInstance(KeyAgreement.ALG_EC_SVDP_DH_PLAIN, false);
+      
+         try{
+             Signature sig = Signature.getInstance(Signature.ALG_ECDSA_SHA_256, false);
+
+            //  sig.init(privKeyU, Signature.MODE_SIGN);    
+        //// sig.signPreComputedHash(TEST_HASH, (short)TEST_HASH.length, (short)65, nullifierOutput, (short)0 );
+         }catch(ISOException e){
+             ISOException.throwIt((short)0x1234);
+
+         }
+
+
+        // Signature sig;
+        // sig = Signature.getInstance(Signature.ALG_ECDSA_SHA, false);
 
 
         // ecPointMultiplier.init(privKeyU);
@@ -132,10 +148,11 @@ public class PLUME extends Applet {
         // }
 
         if (nullifierOutput != null) {
-            apdu.setOutgoing();
-            apdu.setOutgoingLength((short)65);
-            apdu.sendBytesLong(privKeyU., (short) 0, (short)65);
+            // apdu.setOutgoing();
+            // apdu.setOutgoingLength((short)65);
+            // apdu.sendBytesLong(nullifierOutput, (short) 0, (short)65);
         }
+        return;
 
     }
 
@@ -163,19 +180,19 @@ public class PLUME extends Applet {
                 BABYJUBJUB.setCurveParameters(this.sk);
                 BABYJUBJUB.setCurveParameters(pk);
 
-                ecPointMultiplier.init(this.sk);
+                // ecPointMultiplier.init(this.sk);
 
-                ecPointMultiplier.generateSecret(TEST_HASH, (short) 0, (short) LEN_HASHED2CURVE, nullifierOutput,
-                        (short) 0);
+                // ecPointMultiplier.generateSecret(TEST_HASH, (short) 0, (short) LEN_HASHED2CURVE, nullifierOutput,
+                //         (short) 0);
 
             case (byte) 0x01:
                 SECP256k1.setCurveParameters(this.sk);
                 SECP256k1.setCurveParameters(pk);
 
-                ecPointMultiplier.init(this.sk);
+                // ecPointMultiplier.init(this.sk);
 
-                ecPointMultiplier.generateSecret(TEST_PRIVATE_KEY, (short) 0, (short) LEN_HASHED2CURVE, nullifierOutput,
-                        (short) 0);
+                // ecPointMultiplier.generateSecret(TEST_PRIVATE_KEY, (short) 0, (short) LEN_HASHED2CURVE, nullifierOutput,
+                //         (short) 0);
 
         }
 
@@ -238,6 +255,7 @@ public class PLUME extends Applet {
             case (byte) 0x01:
                 try {
                     this.handleComputeTestNullifier(apdu);
+                    return;
                 } catch (ISOException e) {
                     ISOException.throwIt(ISO7816.SW_CONDITIONS_NOT_SATISFIED);
                 }
