@@ -82,7 +82,7 @@ public class PLUME extends Applet {
 
         byte[] hash2curveMsg = JCSystem.makeTransientByteArray(LEN_HASHED2CURVE, JCSystem.CLEAR_ON_DESELECT);
 
-        nullifierOutput = JCSystem.makeTransientByteArray(LEN_NULLIFIER, JCSystem.CLEAR_ON_DESELECT);
+        nullifierOutput = JCSystem.makeTransientByteArray((short)128, JCSystem.CLEAR_ON_DESELECT);
 
         KeyPair kpU;
 
@@ -98,9 +98,9 @@ public class PLUME extends Applet {
       
          try{
              Signature sig = Signature.getInstance(Signature.ALG_ECDSA_SHA_256, false);
-
-            //  sig.init(privKeyU, Signature.MODE_SIGN);    
-        //// sig.signPreComputedHash(TEST_HASH, (short)TEST_HASH.length, (short)65, nullifierOutput, (short)0 );
+// 
+             sig.init(privKeyU, Signature.MODE_SIGN);    
+            //  sig.signPreComputedHash(TEST_HASH, (short)TEST_HASH.length, (short)65, nullifierOutput, (short)0 );
          }catch(ISOException e){
              ISOException.throwIt((short)0x1234);
 
@@ -148,9 +148,9 @@ public class PLUME extends Applet {
         // }
 
         if (nullifierOutput != null) {
-            // apdu.setOutgoing();
-            // apdu.setOutgoingLength((short)65);
-            // apdu.sendBytesLong(nullifierOutput, (short) 0, (short)65);
+            apdu.setOutgoing();
+            apdu.setOutgoingLength((short)128);
+            apdu.sendBytesLong(nullifierOutput, (short) 0, (short)128);
         }
         return;
 
@@ -252,7 +252,7 @@ public class PLUME extends Applet {
         // compute nullifier
         switch (buf[ISO7816.OFFSET_INS]) {
             // compute nullifier given hashed2curve input
-            case (byte) 0x01:
+            case (byte) 0x07:
                 try {
                     this.handleComputeTestNullifier(apdu);
                     return;
