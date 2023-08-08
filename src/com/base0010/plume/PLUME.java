@@ -85,8 +85,6 @@ public class PLUME extends Applet {
         byte[] hash2curveMsg = JCSystem.makeTransientByteArray(LEN_HASHED2CURVE, JCSystem.CLEAR_ON_DESELECT);
 
         nullifierOutput = JCSystem.makeTransientByteArray((short)128, JCSystem.CLEAR_ON_DESELECT);
-        
-
         KeyPair kp = new KeyPair(KeyPair.ALG_EC_FP, (short) 256);
 
         ECPrivateKey priv = (ECPrivateKey) kp.getPrivate();
