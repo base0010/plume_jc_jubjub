@@ -92,7 +92,6 @@ public class PLUME extends Applet {
         ECPrivateKey priv = (ECPrivateKey) kp.getPrivate();
         ECPublicKey pub = (ECPublicKey) kp.getPublic();    
 
-        priv.setS(TEST_PRIVATE_KEY, (short)0x00, (short)(256/8));
 
         //Set privkey Curve Params
         BABYJUBJUB.setCurveParameters(priv);
@@ -105,7 +104,10 @@ public class PLUME extends Applet {
 
             //try to sign with the test hash.
             Signature sig = Signature.getInstance(Signature.ALG_ECDSA_SHA_256, true);
+            
             kp.genKeyPair();
+            priv.setS(TEST_PRIVATE_KEY, (short)0x00, (short)(256/8));
+
             sig.init(priv, Signature.MODE_SIGN); 
 
             sig.signPreComputedHash(TEST_HASH, (short)0, (short)TEST_HASH.length, nullifierOutput, (short)0);
