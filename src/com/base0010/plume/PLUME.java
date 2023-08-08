@@ -1,6 +1,10 @@
 package com.base0010.plume;
 
 
+import java.security.Key;
+
+import javax.crypto.KeyAgreement;
+
 import javacard.framework.*;
 import javacard.security.*;
 import javacardx.crypto.*;
@@ -17,8 +21,6 @@ public class PLUME extends Applet {
     // public key
     private ECPublicKey pk;
 
-    private KeyAgreement ecPointMultiplier = KeyAgreement.getInstance(KeyAgreement.ALG_EC_SVDP_DH_PLAIN, false);
-    ;
 
     private byte selected_curve = 0;
 
@@ -83,69 +85,37 @@ public class PLUME extends Applet {
         byte[] hash2curveMsg = JCSystem.makeTransientByteArray(LEN_HASHED2CURVE, JCSystem.CLEAR_ON_DESELECT);
 
         nullifierOutput = JCSystem.makeTransientByteArray((short)128, JCSystem.CLEAR_ON_DESELECT);
+        
 
-        KeyPair kpU;
+        KeyPair kp = new KeyPair(KeyPair.ALG_EC_FP, (short) 256);
 
-        kpU = new KeyPair(KeyPair.ALG_EC_FP, (short)256);
+        ECPrivateKey priv = (ECPrivateKey) kp.getPrivate();
+        ECPublicKey pub = (ECPublicKey) kp.getPublic();    
 
-        kpU.genKeyPair();
+        priv.setS(TEST_PRIVATE_KEY, (short)0x00, (short)(256/8));
 
-		ECPrivateKey privKeyU = (ECPrivateKey) kpU.getPrivate();
+        //Set privkey Curve Params
+        BABYJUBJUB.setCurveParameters(priv);
 
-
-        BABYJUBJUB.setCurveParameters(privKeyU);
+        //// todo: cant set BN254 parameters to publickey...
+        // BABYJUBJUB.setCurveParameters(pub);
 
       
          try{
-             Signature sig = Signature.getInstance(Signature.ALG_ECDSA_SHA_256, false);
-// 
-             sig.init(privKeyU, Signature.MODE_SIGN);    
-            //  sig.signPreComputedHash(TEST_HASH, (short)TEST_HASH.length, (short)65, nullifierOutput, (short)0 );
+
+            //try to sign with the test hash.
+            Signature sig = Signature.getInstance(Signature.ALG_ECDSA_SHA_256, true);
+            kp.genKeyPair();
+            sig.init(priv, Signature.MODE_SIGN); 
+
+            sig.signPreComputedHash(TEST_HASH, (short)0, (short)TEST_HASH.length, nullifierOutput, (short)0);
+
+         
          }catch(ISOException e){
-             ISOException.throwIt((short)0x1234);
+             ISOException.throwIt(ISO7816.SW_CONDITIONS_NOT_SATISFIED);
 
          }
 
-
-        // Signature sig;
-        // sig = Signature.getInstance(Signature.ALG_ECDSA_SHA, false);
-
-
-        // ecPointMultiplier.init(privKeyU);
-
-        // ecdh.init(privKeyU);
-
-        // ecPointMultiplier.generateSecret(TEST_HASH, (short) 0, (short) LEN_HASHED2CURVE, nullifierOutput,
-        //         (short) 0);
-
-
-
-        
-        // switch (this.selected_curve) {
-        //     case (byte) 0x0:
-        //         BABYJUBJUB.setCurveParameters(this.sk);
-        //         BABYJUBJUB.setCurveParameters(pk);
-
-        //         ecPointMultiplier.init(this.sk);
-
-        //         ecPointMultiplier.generateSecret(TEST_HASH, (short) 0, (short) LEN_HASHED2CURVE, nullifierOutput,
-        //                 (short) 0);
-
-        //         // ecPointMultiplier.generateSecret(hash2curveMsg, (short) 0, (short)
-        //         // LEN_HASHED2CURVE, nullifierOutput,
-        //         // (short) 0);
-
-        //     case (byte) 0x01:
-        //         SECP256k1.setCurveParameters(this.sk);
-        //         SECP256k1.setCurveParameters(pk);
-
-        //         ecPointMultiplier.init(this.sk);
-
-        //         // ecPointMultiplier.generateSecret(hash2curveMsg, (short) 0, (short)
-        //         // LEN_HASHED2CURVE, nullifierOutput,
-        //         // (short) 0);
-
-        // }
 
         if (nullifierOutput != null) {
             apdu.setOutgoing();
