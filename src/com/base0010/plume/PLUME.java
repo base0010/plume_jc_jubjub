@@ -156,8 +156,8 @@ public class PLUME extends Applet {
                 //         (short) 0);
 
             case (byte) 0x01:
-                SECP256k1.setCurveParameters(this.sk);
-                SECP256k1.setCurveParameters(pk);
+                // SECP256k1.setCurveParameters(this.sk);
+                // SECP256k1.setCurveParameters(pk);
 
                 // ecPointMultiplier.init(this.sk);
 
