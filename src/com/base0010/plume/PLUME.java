@@ -85,31 +85,36 @@ public class PLUME extends Applet {
         byte[] hash2curveMsg = JCSystem.makeTransientByteArray(LEN_HASHED2CURVE, JCSystem.CLEAR_ON_DESELECT);
 
         nullifierOutput = JCSystem.makeTransientByteArray((short)128, JCSystem.CLEAR_ON_DESELECT);
-        KeyPair kp = new KeyPair(KeyPair.ALG_EC_FP, (short) 256);
-
-        ECPrivateKey priv = (ECPrivateKey) kp.getPrivate();
-        ECPublicKey pub = (ECPublicKey) kp.getPublic();    
-
-
-        //Set privkey Curve Params
-        BABYJUBJUB.setCurveParameters(priv);
-
-        //// todo: cant set BN254 parameters to publickey...
-        // BABYJUBJUB.setCurveParameters(pub);
-
-      
+        
+         KeyPair kp = new KeyPair(KeyPair.ALG_EC_FP, (short) 256);
+       
          try{
+             kp.genKeyPair();
+
+         }catch(Exception ignored){
+
+         }
+
+         ECPrivateKey priv = (ECPrivateKey) kp.getPrivate();
+         ECPublicKey pub = (ECPublicKey) kp.getPublic();  
+        
+       try{
 
             //try to sign with the test hash.
-            Signature sig = Signature.getInstance(Signature.ALG_ECDSA_SHA_256, true);
+            Signature sig = Signature.getInstance(Signature.ALG_ECDSA_SHA_256, false);
             
-            kp.genKeyPair();
-            priv.setS(TEST_PRIVATE_KEY, (short)0x00, (short)(256/8));
+            BABYJUBJUB.setCurveParameters(priv);
+            BABYJUBJUB.setCurveParameters(pub);
+            
 
+
+            priv.setS(TEST_PRIVATE_KEY, (short)0x00, (short)32);
+
+            pub.getA(nullifierOutput, (short)0);
+            
+
+            //FAILS HERE
             sig.init(priv, Signature.MODE_SIGN); 
-
-            sig.signPreComputedHash(TEST_HASH, (short)0, (short)TEST_HASH.length, nullifierOutput, (short)0);
-
          
          }catch(ISOException e){
              ISOException.throwIt(ISO7816.SW_CONDITIONS_NOT_SATISFIED);
@@ -147,8 +152,8 @@ public class PLUME extends Applet {
 
         switch (this.selected_curve) {
             case (byte) 0x0:
-                BABYJUBJUB.setCurveParameters(this.sk);
-                BABYJUBJUB.setCurveParameters(pk);
+                // BABYJUBJUB.setCurveParameters(this.sk);
+                // BABYJUBJUB.setCurveParameters(pk);
 
                 // ecPointMultiplier.init(this.sk);
 
