@@ -48,7 +48,7 @@ public class BABYJUBJUB {
         (byte)0x67,(byte)0x72,(byte)0x97,(byte)0xdc,(byte)0x39,(byte)0x21,(byte)0x26,(byte)0xf1
     };
 
-    static final byte BABYJUBJUB_K = (byte) 0x01;
+    static final byte BABYJUBJUB_K = (byte) 0x08;
 
     static final short BABYJUBJUB_KEY_SIZE = 256;
 
