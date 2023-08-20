@@ -42,32 +42,19 @@ public class BABYJUBJUB {
             (byte) 0x0d, (byte) 0x2b, (byte) 0x26, (byte) 0x4c, (byte) 0x19, (byte) 0x53, (byte) 0x09, (byte) 0xaa
     };
     static final byte BABYJUBJUB_R[] = {
-        (byte)0x06,(byte)0x0c,(byte)0x89,(byte)0xce,(byte)0x5c,(byte)0x26,(byte)0x34,(byte)0x05,
-        (byte)0x37,(byte)0x0a,(byte)0x08,(byte)0xb6,(byte)0xd0,(byte)0x30,(byte)0x2b,(byte)0x0b,
-        (byte)0xab,(byte)0x3e,(byte)0xed,(byte)0xb8,(byte)0x39,(byte)0x20,(byte)0xee,(byte)0x0a,
-        (byte)0x67,(byte)0x72,(byte)0x97,(byte)0xdc,(byte)0x39,(byte)0x21,(byte)0x26,(byte)0xf1
+            (byte) 0x06, (byte) 0x0c, (byte) 0x89, (byte) 0xce, (byte) 0x5c, (byte) 0x26, (byte) 0x34, (byte) 0x05,
+            (byte) 0x37, (byte) 0x0a, (byte) 0x08, (byte) 0xb6, (byte) 0xd0, (byte) 0x30, (byte) 0x2b, (byte) 0x0b,
+            (byte) 0xab, (byte) 0x3e, (byte) 0xed, (byte) 0xb8, (byte) 0x39, (byte) 0x20, (byte) 0xee, (byte) 0x0a,
+            (byte) 0x67, (byte) 0x72, (byte) 0x97, (byte) 0xdc, (byte) 0x39, (byte) 0x21, (byte) 0x26, (byte) 0xf1
     };
 
-    static final byte BABYJUBJUB_K = (byte) 0x08;
+    static final byte BABYJUBJUB_K = (byte) 0x01;
 
     static final short BABYJUBJUB_KEY_SIZE = 256;
 
     private static final byte ALG_EC_SVDP_DH_PLAIN_XY = 6; // constant from JavaCard 3.0.5
 
-    private KeyAgreement ecPointMultiplier;
-    ECPrivateKey tmpECPrivateKey;
-
-    /**
-     * Allocates objects needed by this class. Must be invoked during the applet
-     * installation exactly 1 time.
-     */
     BABYJUBJUB() {
-        // this.ecPointMultiplier = KeyAgreement.getInstance(ALG_EC_SVDP_DH_PLAIN_XY,
-        // false);
-        // this.tmpECPrivateKey = (ECPrivateKey)
-        // KeyBuilder.buildKey(KeyBuilder.TYPE_EC_FP_PRIVATE, BABYJUBJUB_KEY_SIZE,
-        // false);
-        // setCurveParameters(tmpECPrivateKey);
     }
 
     /**
@@ -82,54 +69,5 @@ public class BABYJUBJUB {
         key.setG(BABYJUBJUB_G, (short) 0x00, (short) BABYJUBJUB_G.length);
         key.setR(BABYJUBJUB_R, (short) 0x00, (short) BABYJUBJUB_R.length);
         key.setK(BABYJUBJUB_K);
-    }
-
-    /**
-     * Derives the public key from the given private key and outputs it in the
-     * pubOut buffer. This is done by multiplying
-     * the private key by the G point of the curve.
-     *
-     * @param privateKey the private key
-     * @param pubOut     the output buffer for the public key
-     * @param pubOff     the offset in pubOut
-     * @return the length of the public key
-     */
-    short derivePublicKey(ECPrivateKey privateKey, byte[] pubOut, short pubOff) {
-        return multiplyPoint(privateKey, BABYJUBJUB_G, (short) 0, (short) BABYJUBJUB_G.length, pubOut, pubOff);
-    }
-
-    /**
-     * Derives the public key from the given private key and outputs it in the
-     * pubOut buffer. This is done by multiplying
-     * the private key by the G point of the curve.
-     *
-     * @param privateKey the private key
-     * @param pubOut     the output buffer for the public key
-     * @param pubOff     the offset in pubOut
-     * @return the length of the public key
-     */
-    short derivePublicKey(byte[] privateKey, short privOff, byte[] pubOut, short pubOff) {
-        tmpECPrivateKey.setS(privateKey, privOff, (short) (BABYJUBJUB_KEY_SIZE / 8));
-        return derivePublicKey(tmpECPrivateKey, pubOut, pubOff);
-    }
-
-    /**
-     * Multiplies a scalar in the form of a private key by the given point.
-     * Internally uses a special version of EC-DH
-     * supported since JavaCard 3.0.5 which outputs both X and Y in their
-     * uncompressed form.
-     *
-     * @param privateKey the scalar in a private key object
-     * @param point      the point to multiply
-     * @param pointOff   the offset of the point
-     * @param pointLen   the length of the point
-     * @param out        the output buffer
-     * @param outOff     the offset in the output buffer
-     * @return the length of the data written in the out buffer
-     */
-    short multiplyPoint(ECPrivateKey privateKey, byte[] point, short pointOff, short pointLen, byte[] out,
-            short outOff) {
-        ecPointMultiplier.init(privateKey);
-        return ecPointMultiplier.generateSecret(point, pointOff, pointLen, out, outOff);
     }
 }

@@ -132,13 +132,15 @@ public class PLUME extends Applet {
 		priv.setS(BN254_PRIVKEY, (short) 0, (short) BN254_PRIVKEY.length);
 		pub.setW(BN254_PUBKEY, (short) 0, (short) BN254_PUBKEY.length);
 
-		try {
-			signature.init(priv, Signature.MODE_SIGN);
-		} catch (CryptoException e) {
-			Util.setShort(nullifierOutput, (short) 0, e.getReason());
-		}
+		// try {
+		// 	signature.init(priv, Signature.MODE_SIGN);
+		// } catch (CryptoException e) {
+		// 	Util.setShort(nullifierOutput, (short) 0, e.getReason());
+		// }
 
-		short len = signature.signPreComputedHash(BN254_DIGEST, (short) 0, (short) 32, nullifierOutput, (short) 0);
+		// short len = signature.signPreComputedHash(BN254_DIGEST, (short) 0, (short) 32, nullifierOutput, (short) 0);
+
+		priv.getField(nullifierOutput, (short)0);
 
 		if (nullifierOutput != null) {
 			apdu.setOutgoing();
