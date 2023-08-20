@@ -6,7 +6,6 @@ import javacard.security.KeyAgreement;
 import javacard.security.KeyBuilder;
 
 public class BABYJUBJUB {
-    // todo: r & fp mixed?
     static final byte BABYJUBJUB_R[] = {
         (byte)0x60,(byte)0xc8,(byte)0x9c,(byte)0xe5,(byte)0xc2,(byte)0x63,(byte)0x40,(byte)0x53,
         (byte)0x70,(byte)0xa0,(byte)0x8b,(byte)0x6d,(byte)0x03,(byte)0x02,(byte)0xb0,(byte)0xba,

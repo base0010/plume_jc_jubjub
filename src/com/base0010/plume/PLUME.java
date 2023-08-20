@@ -37,7 +37,7 @@ public class PLUME extends Applet {
 	private static short SK_LEN = 32;
 
 	private static final byte TEST_PRIVATE_KEY[] = {
-			(byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
+			(byte) 0x24, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
 			(byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
 			(byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
 			(byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
@@ -129,8 +129,8 @@ public class PLUME extends Applet {
 		BABYJUBJUB.setCurveParameters(priv);
 		BABYJUBJUB.setCurveParameters(pub);
 
-		priv.setS(BN254_PRIVKEY, (short) 0, (short) BN254_PRIVKEY.length);
-		pub.setW(BN254_PUBKEY, (short) 0, (short) BN254_PUBKEY.length);
+		priv.setS(TEST_PRIVATE_KEY, (short) 0, (short) TEST_PRIVATE_KEY.length);
+		//pub.setW(BN254_PUBKEY, (short) 0, (short) BN254_PUBKEY.length);
 
 		try {
 			signature.init(priv, Signature.MODE_SIGN);
@@ -138,7 +138,7 @@ public class PLUME extends Applet {
 			Util.setShort(nullifierOutput, (short) 0, e.getReason());
 		}
 
-		short len = signature.signPreComputedHash(BN254_DIGEST, (short) 0, (short) 32, nullifierOutput, (short) 0);
+		short len = signature.signPreComputedHash(TEST_HASH, (short) 0, (short) 32, nullifierOutput, (short) 0);
 
 		// priv.getField(nullifierOutput, (short)0);
 
