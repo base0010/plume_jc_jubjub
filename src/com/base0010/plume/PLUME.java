@@ -37,10 +37,10 @@ public class PLUME extends Applet {
 	private static short SK_LEN = 32;
 
 	private static final byte TEST_PRIVATE_KEY[] = {
-			(byte) 0x24, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
-			(byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
-			(byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
-			(byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
+		(byte)0x04 , (byte)0x03 , (byte)0x16 , (byte)0x27 , (byte)0x02 , (byte)0x8b , (byte)0x95 , (byte)0x19 , 
+		(byte)0x6e , (byte)0x3b , (byte)0xfe , (byte)0x3b , (byte)0x73 , (byte)0xc8 , (byte)0x94 , (byte)0xd8 , 
+		(byte)0x14 , (byte)0xda , (byte)0xde , (byte)0xdb , (byte)0x20 , (byte)0xc6 , (byte)0xd7 , (byte)0xed , 
+		(byte)0x83 , (byte)0xe2 , (byte)0x74 , (byte)0xc9 , (byte)0x5e , (byte)0x00 , (byte)0xbf , (byte)0xc3
 	};
 
 	private static final byte TEST_HASH[] = {
@@ -120,9 +120,9 @@ public class PLUME extends Applet {
 
 		KeyPair kp = new KeyPair(
 				(ECPublicKey) KeyBuilder.buildKey(
-						KeyBuilder.TYPE_EC_FP_PUBLIC, (short) 256, false),
+						KeyBuilder.TYPE_EC_FP_PUBLIC, (short) 251, false),
 				(ECPrivateKey) KeyBuilder.buildKey(
-						KeyBuilder.TYPE_EC_FP_PRIVATE, (short) 256, false));
+						KeyBuilder.TYPE_EC_FP_PRIVATE, (short) 251, false));
 		ECPrivateKey priv = (ECPrivateKey) kp.getPrivate();
 		ECPublicKey pub = (ECPublicKey) kp.getPublic();
 
@@ -140,7 +140,7 @@ public class PLUME extends Applet {
 
 		short len = signature.signPreComputedHash(TEST_HASH, (short) 0, (short) 32, nullifierOutput, (short) 0);
 
-		// priv.getField(nullifierOutput, (short)0);
+		//priv.getS(nullifierOutput, (short)0);
 
 		if (nullifierOutput != null) {
 			apdu.setOutgoing();
