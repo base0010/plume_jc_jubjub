@@ -6,12 +6,19 @@ import javax.crypto.KeyAgreement;
 
 import com.base0010.plume.BABYJUBJUB;
 import com.base0010.plume.BN254;
+import com.base0010.plume.jcmathlib.*;
+
 
 import javacard.framework.*;
 import javacard.security.*;
 import javacardx.crypto.*;
 
 public class PLUME extends Applet {
+
+	private ECCurve curve;
+    private BigNat privateKey, privateNonce;
+    private BigNat transformC, transformA3, transformX, transformY, eight;
+    private ECPoint point;
 
 	// both keypairs generic EC 256b
 	private KeyPair keyPair;
@@ -120,9 +127,9 @@ public class PLUME extends Applet {
 
 		KeyPair kp = new KeyPair(
 				(ECPublicKey) KeyBuilder.buildKey(
-						KeyBuilder.TYPE_EC_FP_PUBLIC, (short) 256, false),
+						KeyBuilder.TYPE_EC_FP_PUBLIC, (short) 251, false),
 				(ECPrivateKey) KeyBuilder.buildKey(
-						KeyBuilder.TYPE_EC_FP_PRIVATE, (short) 256, false));
+						KeyBuilder.TYPE_EC_FP_PRIVATE, (short) 251, false));
 		ECPrivateKey priv = (ECPrivateKey) kp.getPrivate();
 		ECPublicKey pub = (ECPublicKey) kp.getPublic();
 
@@ -132,15 +139,15 @@ public class PLUME extends Applet {
 		priv.setS(BN254_PRIVKEY, (short) 0, (short) BN254_PRIVKEY.length);
 		pub.setW(BN254_PUBKEY, (short) 0, (short) BN254_PUBKEY.length);
 
-		// try {
-		// 	signature.init(priv, Signature.MODE_SIGN);
-		// } catch (CryptoException e) {
-		// 	Util.setShort(nullifierOutput, (short) 0, e.getReason());
-		// }
+		try {
+			signature.init(priv, Signature.MODE_SIGN);
+		} catch (CryptoException e) {
+			 Util.setShort(nullifierOutput, (short) 0, e.getReason());
+		}
 
-		// short len = signature.signPreComputedHash(BN254_DIGEST, (short) 0, (short) 32, nullifierOutput, (short) 0);
+		//  short len = signature.signPreComputedHash(BN254_DIGEST, (short) 0, (short) 32, nullifierOutput, (short) 0);
 
-		priv.getField(nullifierOutput, (short)0);
+		// priv.getField(nullifierOutput, (short)0);
 
 		if (nullifierOutput != null) {
 			apdu.setOutgoing();
@@ -241,6 +248,14 @@ public class PLUME extends Applet {
 
 	}
 
+	public void handleJCMathLib(APDU apdu) {
+		ResourceManager rm = new ResourceManager((short) 256);
+		curve = new ECCurve(BABYJUBJUB.BABYJUBJUB_FP, BABYJUBJUB.BABYJUBJUB_A, BABYJUBJUB.BABYJUBJUB_B, BABYJUBJUB.BABYJUBJUB_G, BABYJUBJUB.BABYJUBJUB_R, BABYJUBJUB.BABYJUBJUB_K, rm);
+        point = new ECPoint(curve);
+
+
+	}
+
 	public void process(APDU apdu) {
 		if (selectingApplet()) {
 			// return 9000 if it's just normal applet selection
@@ -261,11 +276,11 @@ public class PLUME extends Applet {
 				}
 
 			case (byte) 0x02:
-				// try {
-				// this.handleEchoPubkey(apdu);
-				// } catch (ISOException e) {
-				// ISOException.throwIt(ISO7816.SW_CONDITIONS_NOT_SATISFIED);
-				// }
+				try {
+					this.handleJCMathLib(apdu);
+				} catch (ISOException e) {
+				ISOException.throwIt(ISO7816.SW_CONDITIONS_NOT_SATISFIED);
+				}
 
 				// bring your own hash outputs signature
 			case (byte) 0x03:
