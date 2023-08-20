@@ -4,6 +4,7 @@ import java.security.Key;
 
 import javax.crypto.KeyAgreement;
 
+import com.base0010.plume.BABYJUBJUB;
 import com.base0010.plume.BN254;
 
 import javacard.framework.*;
@@ -27,6 +28,7 @@ public class PLUME extends Applet {
 	private byte[] nullifierOutput;
 
 	BN254 bn254;
+	BABYJUBJUB bjj;
 	Signature signature;
 
 	// lens in bytes
@@ -77,6 +79,8 @@ public class PLUME extends Applet {
 	// inits keypair with default TEST_HASH
 	public PLUME() {
 		bn254 = new BN254();
+		bjj = new BABYJUBJUB();
+
 		signature = Signature.getInstance(Signature.ALG_ECDSA_SHA_256, false);
 
 		// keyPair = new KeyPair(KeyPair.ALG_EC_FP, (short) 256);
@@ -122,8 +126,8 @@ public class PLUME extends Applet {
 		ECPrivateKey priv = (ECPrivateKey) kp.getPrivate();
 		ECPublicKey pub = (ECPublicKey) kp.getPublic();
 
-		BN254.setCurveParameters(priv);
-		BN254.setCurveParameters(pub);
+		BABYJUBJUB.setCurveParameters(priv);
+		BABYJUBJUB.setCurveParameters(pub);
 
 		priv.setS(BN254_PRIVKEY, (short) 0, (short) BN254_PRIVKEY.length);
 		pub.setW(BN254_PUBKEY, (short) 0, (short) BN254_PUBKEY.length);
