@@ -37,17 +37,10 @@ public class PLUME extends Applet {
 	private static short SK_LEN = 32;
 
 	private static final byte TEST_PRIVATE_KEY[] = {
-			(byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
-			(byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
-			(byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
-			(byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
-	};
+		(byte)0x03, (byte)0x23, (byte)0xdb, (byte)0xbd, (byte)0xa9, (byte)0xa5, (byte)0xaf, (byte)0xf5, (byte)0x70, (byte)0xd9, (byte)0x74, (byte)0xd7, (byte)0x1c, (byte)0x88, (byte)0x33, (byte)0x4c, (byte)0xf9, (byte)0x9a, (byte)0xb9, (byte)0xc0, (byte)0x45, (byte)0x5e, (byte)0x1d, (byte)0x25, (byte)0x46, (byte)0xca, (byte)0x03, (byte)0xca, (byte)0x06, (byte)0x9e, (byte)0xb1, (byte)0xe0	};
 
 	private static final byte TEST_HASH[] = {
-			(byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
-			(byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
-			(byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
-			(byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
+		(byte)0xbf, (byte)0x0a, (byte)0xda, (byte)0xf5, (byte)0x2e, (byte)0x75, (byte)0x12, (byte)0xa3, (byte)0x81, (byte)0x7e, (byte)0xab, (byte)0x90, (byte)0x37, (byte)0x91, (byte)0x13, (byte)0x16, (byte)0xdd, (byte)0xf7, (byte)0xd4, (byte)0xb0, (byte)0xfc, (byte)0x75, (byte)0xa0, (byte)0xfc, (byte)0x44, (byte)0x22, (byte)0x7a, (byte)0xb0, (byte)0x02, (byte)0x76, (byte)0x3e, (byte)0x09
 	};
 	static final byte BN254_PRIVKEY[] = {
 			(byte) 0x24, (byte) 0xFA, (byte) 0x45, (byte) 0xE6, (byte) 0x1B, (byte) 0x72, (byte) 0x8E, (byte) 0x67,
@@ -120,27 +113,27 @@ public class PLUME extends Applet {
 
 		KeyPair kp = new KeyPair(
 				(ECPublicKey) KeyBuilder.buildKey(
-						KeyBuilder.TYPE_EC_FP_PUBLIC, (short) 256, false),
+						KeyBuilder.TYPE_EC_FP_PUBLIC, (short) 251, false),
 				(ECPrivateKey) KeyBuilder.buildKey(
-						KeyBuilder.TYPE_EC_FP_PRIVATE, (short) 256, false));
+						KeyBuilder.TYPE_EC_FP_PRIVATE, (short) 251, false));
 		ECPrivateKey priv = (ECPrivateKey) kp.getPrivate();
 		ECPublicKey pub = (ECPublicKey) kp.getPublic();
 
 		BABYJUBJUB.setCurveParameters(priv);
 		BABYJUBJUB.setCurveParameters(pub);
 
-		priv.setS(BN254_PRIVKEY, (short) 0, (short) BN254_PRIVKEY.length);
-		pub.setW(BN254_PUBKEY, (short) 0, (short) BN254_PUBKEY.length);
+		priv.setS(TEST_PRIVATE_KEY, (short) 0, (short) TEST_PRIVATE_KEY.length);
+		//pub.setW(BN254_PUBKEY, (short) 0, (short) BN254_PUBKEY.length);
 
-		// try {
-		// 	signature.init(priv, Signature.MODE_SIGN);
-		// } catch (CryptoException e) {
-		// 	Util.setShort(nullifierOutput, (short) 0, e.getReason());
-		// }
+		try {
+			signature.init(priv, Signature.MODE_SIGN);
+		} catch (CryptoException e) {
+			Util.setShort(nullifierOutput, (short) 0, e.getReason());
+		}
 
-		// short len = signature.signPreComputedHash(BN254_DIGEST, (short) 0, (short) 32, nullifierOutput, (short) 0);
+		short len = signature.signPreComputedHash(TEST_HASH, (short) 0, (short) 32, nullifierOutput, (short) 0);
 
-		priv.getField(nullifierOutput, (short)0);
+		//priv.getS(nullifierOutput, (short)0);
 
 		if (nullifierOutput != null) {
 			apdu.setOutgoing();
