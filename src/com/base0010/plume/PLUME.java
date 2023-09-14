@@ -37,8 +37,8 @@ public class PLUME extends Applet {
 	private static short SK_LEN = 32;
 
 	private static final byte TEST_HASH[] = {
-		(byte) 0x00, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
-		(byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
+		(byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+		(byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
 		(byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
 		(byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
 	};
@@ -68,32 +68,14 @@ public class PLUME extends Applet {
 	};
 
 	private static final byte TEST_PRIVATE_KEY[] = {
-		(byte)0x04, (byte)0x03, (byte)0x16, (byte)0x27, (byte)0x02, (byte)0x8b, (byte)0x95, (byte)0x19, (byte)0x6e, (byte)0x3b, (byte)0xfe, (byte)0x3b, (byte)0x73, (byte)0xc8, (byte)0x94, (byte)0xd8, (byte)0x14, (byte)0xda, (byte)0xde, (byte)0xdb, (byte)0x20, (byte)0xc6, (byte)0xd7, (byte)0xed, (byte)0x83, (byte)0xe2, (byte)0x74, (byte)0xc9, (byte)0x5e, (byte)0x00, (byte)0xbf, (byte)0xc3
-	};
-	static final byte BN254_PRIVKEY[] = {
-			(byte) 0x24, (byte) 0xFA, (byte) 0x45, (byte) 0xE6, (byte) 0x1B, (byte) 0x72, (byte) 0x8E, (byte) 0x67,
-			(byte) 0x28, (byte) 0x53, (byte) 0x83, (byte) 0x76, (byte) 0x85, (byte) 0x18, (byte) 0x9B, (byte) 0xF5,
-			(byte) 0x61, (byte) 0x30, (byte) 0x11, (byte) 0x39, (byte) 0x98, (byte) 0x7D, (byte) 0xC5, (byte) 0x8A,
-			(byte) 0xA9, (byte) 0x10, (byte) 0x32, (byte) 0x76, (byte) 0xD9, (byte) 0x52, (byte) 0xBE, (byte) 0xCC
-	};
-	static final byte BN254_PUBKEY[] = {
-			(byte) 0x04, (byte) 0x13, (byte) 0x4F, (byte) 0x98, (byte) 0x09, (byte) 0x8B, (byte) 0x93, (byte) 0xF7,
-			(byte) 0xF2, (byte) 0x76, (byte) 0x48, (byte) 0x5D, (byte) 0x2B, (byte) 0x11, (byte) 0xC8, (byte) 0x84,
-			(byte) 0xAC, (byte) 0x4C, (byte) 0x4F, (byte) 0x2F, (byte) 0x2D, (byte) 0xA5, (byte) 0x22, (byte) 0x87,
-			(byte) 0xD9, (byte) 0xC2, (byte) 0x7D, (byte) 0xD0, (byte) 0x58, (byte) 0xAF, (byte) 0x13, (byte) 0x41,
-			(byte) 0xC5, (byte) 0x1A, (byte) 0x0F, (byte) 0xF9, (byte) 0xEB, (byte) 0x01, (byte) 0xD1, (byte) 0xB7,
-			(byte) 0xE1, (byte) 0xFA, (byte) 0x4B, (byte) 0x0F, (byte) 0xD7, (byte) 0xF1, (byte) 0x17, (byte) 0xF8,
-			(byte) 0xAD, (byte) 0x6C, (byte) 0x34, (byte) 0x4A, (byte) 0x7E, (byte) 0x26, (byte) 0x67, (byte) 0x53,
-			(byte) 0xCD, (byte) 0xF6, (byte) 0x19, (byte) 0x15, (byte) 0x97, (byte) 0x28, (byte) 0xF6, (byte) 0x6F,
-			(byte) 0x22
-	};
+		(byte)0x03, (byte)0x23, (byte)0xdb, (byte)0xbd, (byte)0xa9, (byte)0xa5, (byte)0xaf, (byte)0xf5,
+		(byte)0x70, (byte)0xd9, (byte)0x74, (byte)0xd7, (byte)0x1c, (byte)0x88, (byte)0x33, (byte)0x4c,
+		(byte)0xf9, (byte)0x9a, (byte)0xb9, (byte)0xc0, (byte)0x45, (byte)0x5e, (byte)0x1d, (byte)0x25,
+		(byte)0x46, (byte)0xca, (byte)0x03, (byte)0xca, (byte)0x06, (byte)0x9e, (byte)0xb1, (byte)0xe0
+};
 
-	static final byte BN254_DIGEST[] = {
-			(byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-			(byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-			(byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-			(byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x01
-	};
+	
+
 	// SECP256k1 secp256k1 = new SECP256k1();
 	// BABYJUBJUB babyjubjub = new BABYJUBJUB();
 
@@ -165,19 +147,19 @@ public class PLUME extends Applet {
 
 		short len;
 
-		switch(p1){
-			case (byte)0x00:
-				len = signature.signPreComputedHash(TEST_HASH, (short) 0, (short) TEST_HASH.length, nullifierOutput, (short) 0);
-			case (byte)0x01:
-				len = signature.signPreComputedHash(H1, (short) 0, (short) H1.length, nullifierOutput, (short) 0);
-			case (byte)0x02:
-				len = signature.signPreComputedHash(H2, (short) 0, (short) H2.length, nullifierOutput, (short) 0);
-			case (byte)0x03:
-				len = signature.signPreComputedHash(H3, (short) 0, (short) H3.length, nullifierOutput, (short) 0);
-			default:
-				len = signature.signPreComputedHash(TEST_HASH, (short) 0, (short) TEST_HASH.length, nullifierOutput, (short) 0);
+		// switch(p1){
+		// 	case (byte)0x00:
+		len = signature.signPreComputedHash(TEST_HASH, (short) 0, (short) TEST_HASH.length, nullifierOutput, (short) 0);
+		// 	case (byte)0x01:
+		// 		len = signature.signPreComputedHash(H1, (short) 0, (short) H1.length, nullifierOutput, (short) 0);
+		// 	case (byte)0x02:
+		// 		len = signature.signPreComputedHash(H2, (short) 0, (short) H2.length, nullifierOutput, (short) 0);
+		// 	case (byte)0x03:
+		// 		len = signature.signPreComputedHash(H3, (short) 0, (short) H3.length, nullifierOutput, (short) 0);
+		// 	default:
+		// 		len = signature.signPreComputedHash(TEST_HASH, (short) 0, (short) TEST_HASH.length, nullifierOutput, (short) 0);
 
-		}
+		// }
 
 		//priv.getS(nullifierOutput, (short)0);
 
