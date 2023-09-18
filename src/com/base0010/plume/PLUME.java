@@ -36,36 +36,15 @@ public class PLUME extends Applet {
 	private static short PK_LEN = 65;
 	private static short SK_LEN = 32;
 
-	private static final byte TEST_HASH[] = {
+
+	private byte INCREMENTAL_HASH[] = {
 		(byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
 		(byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-		(byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
-		(byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE, (byte) 0xAB, (byte) 0xAD, (byte) 0xBA, (byte) 0xBE,
+		(byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+		(byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+		
 	};
 
-	//intial hash byte 0x4f
-	private static final byte H1[] = {
-		(byte)0x00, (byte)0x70, (byte)0x89, (byte)0x8d, (byte)0x79, (byte)0xf4, (byte)0x74, (byte)0xd2,
-		(byte)0x7c, (byte)0x97, (byte)0x2a, (byte)0xa1, (byte)0xa9, (byte)0xcc, (byte)0xb5, (byte)0x60,
-		(byte)0x35, (byte)0xcb, (byte)0xcb, (byte)0x0f, (byte)0x46, (byte)0x2b, (byte)0x93, (byte)0xf7,
-		(byte)0x8a, (byte)0xb8, (byte)0xca, (byte)0x7e, (byte)0x38, (byte)0xa1, (byte)0x37, (byte)0x2a
-	};
-
-	//intial hash byte 0x35
-	private static final byte H2[] = {
-		(byte)0x00, (byte)0x84, (byte)0x57, (byte)0x14, (byte)0x01, (byte)0x1c, (byte)0xba, (byte)0xaa,
-		(byte)0x51, (byte)0xba, (byte)0x95, (byte)0x2f, (byte)0xd3, (byte)0xac, (byte)0xd3, (byte)0x47,
-		(byte)0x25, (byte)0xab, (byte)0xaf, (byte)0xbd, (byte)0x7d, (byte)0x43, (byte)0xa9, (byte)0xde,
-		(byte)0x27, (byte)0x9d, (byte)0xe4, (byte)0x63, (byte)0x23, (byte)0xad, (byte)0x1f, (byte)0x2e
-	};
-
-	//intial hash byte 0xbf
-	private static final byte H3[] = {
-		(byte)0x00, (byte)0x0a, (byte)0xda, (byte)0xf5, (byte)0x2e, (byte)0x75, (byte)0x12, (byte)0xa3,
-		(byte)0x81, (byte)0x7e, (byte)0xab, (byte)0x90, (byte)0x37, (byte)0x91, (byte)0x13, (byte)0x16,
-		(byte)0xdd, (byte)0xf7, (byte)0xd4, (byte)0xb0, (byte)0xfc, (byte)0x75, (byte)0xa0, (byte)0xfc,
-		(byte)0x44, (byte)0x22, (byte)0x7a, (byte)0xb0, (byte)0x02, (byte)0x76, (byte)0x3e, (byte)0x09
-	};
 
 	private static final byte TEST_PRIVATE_KEY[] = {
 		(byte)0x03, (byte)0x23, (byte)0xdb, (byte)0xbd, (byte)0xa9, (byte)0xa5, (byte)0xaf, (byte)0xf5,
@@ -86,14 +65,7 @@ public class PLUME extends Applet {
 
 		signature = Signature.getInstance(Signature.ALG_ECDSA_SHA_256, false);
 
-		// keyPair = new KeyPair(KeyPair.ALG_EC_FP, (short) 256);
-
-		// sk = (ECPrivateKey) keyPair.getPrivate();
-
-		// sk.setS(TEST_PRIVATE_KEY, (short) 0, (short) TEST_PRIVATE_KEY.length);
-
-		// pk = (ECPublicKey) keyPair.getPublic();
-
+		// INCREMENTAL_HASH = new byte[32];
 	}
 
 	// generates a random EC256 keypair
@@ -102,6 +74,18 @@ public class PLUME extends Applet {
 
 		// sk = (ECPrivateKey) keyPair.getPrivate();
 		// pk = (ECPublicKey) keyPair.getPublic();
+	}
+
+	public void incrementHash(){
+		byte castLastByte = INCREMENTAL_HASH[31];
+		if(INCREMENTAL_HASH[30] != 0x00){
+			//logic for nonce > 255
+		}
+		//increment the last byte in the hash buf
+		//ready to hash
+		castLastByte++;
+		INCREMENTAL_HASH[31] = castLastByte;
+		
 	}
 
 	public static void install(byte bArray[], short bOffset, byte bLength) {
@@ -116,12 +100,6 @@ public class PLUME extends Applet {
 		byte p1 = buf[2];
 		byte p2 = buf[3];
 
-		// todo: confirm these lengths, make global.
-		short LEN_HASHED2CURVE = (short) TEST_HASH.length;
-		// check length is equal to ecdsa sig len or 128?
-		short LEN_NULLIFIER = (short) 128;
-
-		byte[] hash2curveMsg = JCSystem.makeTransientByteArray(LEN_HASHED2CURVE, JCSystem.CLEAR_ON_DESELECT);
 
 		nullifierOutput = JCSystem.makeTransientByteArray((short) 128, JCSystem.CLEAR_ON_DESELECT);
 
@@ -141,7 +119,7 @@ public class PLUME extends Applet {
 
 		kp.genKeyPair();
 
-		// priv.setS(TEST_PRIVATE_KEY, (short) 0, (short) TEST_PRIVATE_KEY.length);
+		priv.setS(TEST_PRIVATE_KEY, (short) 0, (short) TEST_PRIVATE_KEY.length);
 		// //pub.setW(BN254_PUBKEY, (short) 0, (short) BN254_PUBKEY.length);
 
 		try {
@@ -150,21 +128,23 @@ public class PLUME extends Applet {
 			Util.setShort(nullifierOutput, (short) 0, e.getReason());
 		}
 
-		short len;
 
-		len = signature.signPreComputedHash(TEST_HASH, (short) 0, (short) TEST_HASH.length, nullifierOutput, (short) 0);
 		
-		 nullifierOutput[(short)(len+1)] = (byte)0xff;
-		 nullifierOutput[(short)(len+2)] = (byte)0xff;
-		 nullifierOutput[(short)(len+3)] = (byte)0xff;
+		short len = signature.signPreComputedHash(INCREMENTAL_HASH, (short) 0, (short) INCREMENTAL_HASH.length, nullifierOutput, (short) 0);
+		
+		//our seperator between sig and hash
+		nullifierOutput[(short)(len+1)] = (byte)0xff;
+		nullifierOutput[(short)(len+2)] = (byte)0xff;
+		nullifierOutput[(short)(len+3)] = (byte)0xff;
 
-		 short sOffset = (short)(len + 4);
-		 priv.getS(nullifierOutput, sOffset);
+		//copy the hash that was signed
+		Util.arrayCopy(INCREMENTAL_HASH, (short)0, nullifierOutput, (short)(len+4), (short)INCREMENTAL_HASH.length);
+		incrementHash();
 
 		if (nullifierOutput != null) {
 			apdu.setOutgoing();
-			apdu.setOutgoingLength((short) len + 4 + 64);
-			apdu.sendBytesLong(nullifierOutput, (short) 0, (short) len + 4 + 64);
+			apdu.setOutgoingLength((short) 128);
+			apdu.sendBytesLong(nullifierOutput, (short) 0, (short) 128);
 		}
 		return;
 
