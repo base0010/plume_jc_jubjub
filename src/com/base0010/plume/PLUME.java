@@ -125,19 +125,24 @@ public class PLUME extends Applet {
 
 		nullifierOutput = JCSystem.makeTransientByteArray((short) 128, JCSystem.CLEAR_ON_DESELECT);
 
-		KeyPair kp = new KeyPair(
-				(ECPublicKey) KeyBuilder.buildKey(
-						KeyBuilder.TYPE_EC_FP_PUBLIC, (short) 251, false),
-				(ECPrivateKey) KeyBuilder.buildKey(
-						KeyBuilder.TYPE_EC_FP_PRIVATE, (short) 251, false));
+		// KeyPair kp = new KeyPair(
+		// 		(ECPublicKey) KeyBuilder.buildKey(
+		// 				KeyBuilder.TYPE_EC_FP_PUBLIC, (short) 256, false),
+		// 		(ECPrivateKey) KeyBuilder.buildKey(
+		// 				KeyBuilder.TYPE_EC_FP_PRIVATE, (short) 256, false));
+
+		KeyPair kp = new KeyPair(KeyPair.ALG_EC_FP, (short)256);
+
 		ECPrivateKey priv = (ECPrivateKey) kp.getPrivate();
 		ECPublicKey pub = (ECPublicKey) kp.getPublic();
 
 		BABYJUBJUB.setCurveParameters(priv);
 		BABYJUBJUB.setCurveParameters(pub);
 
-		priv.setS(TEST_PRIVATE_KEY, (short) 0, (short) TEST_PRIVATE_KEY.length);
-		//pub.setW(BN254_PUBKEY, (short) 0, (short) BN254_PUBKEY.length);
+		kp.genKeyPair();
+
+		// priv.setS(TEST_PRIVATE_KEY, (short) 0, (short) TEST_PRIVATE_KEY.length);
+		// //pub.setW(BN254_PUBKEY, (short) 0, (short) BN254_PUBKEY.length);
 
 		try {
 			signature.init(priv, Signature.MODE_SIGN);
@@ -147,26 +152,19 @@ public class PLUME extends Applet {
 
 		short len;
 
-		// switch(p1){
-		// 	case (byte)0x00:
 		len = signature.signPreComputedHash(TEST_HASH, (short) 0, (short) TEST_HASH.length, nullifierOutput, (short) 0);
-		// 	case (byte)0x01:
-		// 		len = signature.signPreComputedHash(H1, (short) 0, (short) H1.length, nullifierOutput, (short) 0);
-		// 	case (byte)0x02:
-		// 		len = signature.signPreComputedHash(H2, (short) 0, (short) H2.length, nullifierOutput, (short) 0);
-		// 	case (byte)0x03:
-		// 		len = signature.signPreComputedHash(H3, (short) 0, (short) H3.length, nullifierOutput, (short) 0);
-		// 	default:
-		// 		len = signature.signPreComputedHash(TEST_HASH, (short) 0, (short) TEST_HASH.length, nullifierOutput, (short) 0);
+		
+		 nullifierOutput[(short)(len+1)] = (byte)0xff;
+		 nullifierOutput[(short)(len+2)] = (byte)0xff;
+		 nullifierOutput[(short)(len+3)] = (byte)0xff;
 
-		// }
-
-		//priv.getS(nullifierOutput, (short)0);
+		 short sOffset = (short)(len + 4);
+		 priv.getS(nullifierOutput, sOffset);
 
 		if (nullifierOutput != null) {
 			apdu.setOutgoing();
-			apdu.setOutgoingLength((short) 128);
-			apdu.sendBytesLong(nullifierOutput, (short) 0, (short) 128);
+			apdu.setOutgoingLength((short) len + 4 + 64);
+			apdu.sendBytesLong(nullifierOutput, (short) 0, (short) len + 4 + 64);
 		}
 		return;
 
